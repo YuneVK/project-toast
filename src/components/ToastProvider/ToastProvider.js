@@ -1,9 +1,17 @@
 import React from "react"
 
+import useKeydown from "../../hooks/useKeydown"
+
 const ToastContext = React.createContext()
 
 function ToastProvider({ children }) {
   const [toasts, setToasts] = React.useState([])
+
+  const dismissAllToasts = React.useCallback(() => {
+    setToasts([])
+  }, [])
+
+  useKeydown("Escape", dismissAllToasts)
 
   const createToast = (message, variant) => {
     setToasts((currentToasts) => [
@@ -23,20 +31,6 @@ function ToastProvider({ children }) {
       return newToasts
     })
   }
-
-  React.useEffect(() => {
-    const handleEsc = (event) => {
-      if (event.key === "Escape") {
-        setToasts([])
-      }
-    }
-
-    window.addEventListener("keydown", handleEsc)
-
-    return () => {
-      window.removeEventListener("keydown", handleEsc)
-    }
-  }, [])
 
   const value = { toasts, createToast, dismissToast }
 
