@@ -11,21 +11,30 @@ import VisuallyHidden from "../VisuallyHidden"
 
 import styles from "./Toast.module.css"
 
-const ICONS_BY_VARIANT = {
-  notice: Info,
-  warning: AlertTriangle,
-  success: CheckCircle,
-  error: AlertOctagon,
+export const VARIANTS = {
+  notice: "notice",
+  warning: "warning",
+  success: "success",
+  error: "error",
 }
 
-function Toast() {
+const ICONS_BY_VARIANT = {
+  [VARIANTS.notice]: Info,
+  [VARIANTS.warning]: AlertTriangle,
+  [VARIANTS.success]: CheckCircle,
+  [VARIANTS.error]: AlertOctagon,
+}
+
+function Toast({ variant = VARIANTS.notice, onClose, children }) {
+  const Icon = ICONS_BY_VARIANT[variant]
+
   return (
-    <div className={`${styles.toast} ${styles.notice}`}>
+    <div className={`${styles.toast} ${styles[variant]}`}>
       <div className={styles.iconContainer}>
-        <Info size={24} />
+        <Icon size={24} />
       </div>
-      <p className={styles.content}>16 photos have been uploaded</p>
-      <button className={styles.closeButton}>
+      <p className={styles.content}>{children}</p>
+      <button className={styles.closeButton} onClick={onClose}>
         <X size={24} />
         <VisuallyHidden>Dismiss message</VisuallyHidden>
       </button>
