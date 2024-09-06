@@ -1,13 +1,26 @@
 import React from "react"
 
+import Toast from "../Toast"
+import { useToast } from "../ToastProvider"
+
 import styles from "./ToastShelf.module.css"
 
-function ToastShelf({ children }) {
+function ToastShelf() {
+  const { toasts, dismissToast } = useToast()
+
   return (
     <ol className={styles.wrapper}>
-      {children.map((child, index) => (
-        <li key={index} className={styles.toastWrapper}>
-          {child}
+      {toasts.map((toast) => (
+        <li key={toast.id} className={styles.toastWrapper}>
+          <Toast
+            key={toast.id}
+            variant={toast.variant}
+            onDismiss={() => {
+              dismissToast(toast.id)
+            }}
+          >
+            {toast.message}
+          </Toast>
         </li>
       ))}
     </ol>
