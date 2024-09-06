@@ -2,16 +2,18 @@ import React from "react"
 
 import Button from "../Button"
 import Toast, { VARIANTS } from "../Toast"
+import ToastShelf from "../ToastShelf"
 
 import styles from "./ToastPlayground.module.css"
 
 const VARIANT_OPTIONS = Object.keys(VARIANTS)
+const DEFAULT_VARIANT = VARIANT_OPTIONS[0]
 
 function ToastPlayground() {
-  const [showToast, setShowToast] = React.useState(false)
+  const [toasts, setToasts] = React.useState([])
 
   const [message, setMessage] = React.useState("")
-  const [variant, setVariant] = React.useState(VARIANT_OPTIONS[0])
+  const [variant, setVariant] = React.useState(DEFAULT_VARIANT)
 
   const handleMessageChange = (event) => {
     setMessage(event.target.value)
@@ -21,14 +23,28 @@ function ToastPlayground() {
     setVariant(event.target.value)
   }
 
-  const handleShowToast = (event) => {
+  const handleCreateToast = (event) => {
     event.preventDefault()
 
-    setShowToast(true)
+    setToasts((currentToasts) => [
+      ...currentToasts,
+      {
+        id: crypto.randomUUID(),
+        message,
+        variant,
+      },
+    ])
+
+    setMessage("")
+    setVariant(DEFAULT_VARIANT)
   }
 
-  const handleHideToast = () => {
-    setShowToast(false)
+  const handleDismissToast = (id) => {
+    setToasts((currentToasts) => {
+      const newToasts = currentToasts.filter((toast) => toast.id !== id)
+
+      return newToasts
+    })
   }
 
   return (
@@ -38,13 +54,21 @@ function ToastPlayground() {
         <h1>Toast Playground</h1>
       </header>
 
-      {showToast && (
-        <Toast variant={variant} onClose={handleHideToast}>
-          {message}
-        </Toast>
-      )}
+      <ToastShelf>
+        {toasts.map((toast, index) => (
+          <Toast
+            key={toast.id}
+            variant={toast.variant}
+            onDismiss={() => {
+              handleDismissToast(toast.id)
+            }}
+          >
+            {toast.message}
+          </Toast>
+        ))}
+      </ToastShelf>
 
-      <form className={styles.controlsWrapper} onSubmit={handleShowToast}>
+      <form className={styles.controlsWrapper} onSubmit={handleCreateToast}>
         <div className={styles.row}>
           <label
             htmlFor="message"
